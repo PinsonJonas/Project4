@@ -2,7 +2,8 @@
 """
 "PYSTONE" Benchmark Program
 Version:        Python/1.2 (corresponds to C/1.1 plus 3 Pystone fixes)
-Author:         Reinhold P. Weicker,  CACM Vol 27, No 10, 10/84 pg. 1013.
+Author:         Adapted by J. Pinson, removed clock and used utime.time as clock does not exist anymore
+                Reinhold P. Weicker,  CACM Vol 27, No 10, 10/84 pg. 1013.
                 Translated from ADA to C by Rick Richardson.
                 Every method to preserve ADA-likeness has been used,
                 at the expense of C-ness.
@@ -29,16 +30,17 @@ Version History:
 
 LOOPS = 50000
 
-#from utime import clock
 import utime
+
 __version__ = "1.2"
 
 [Ident1, Ident2, Ident3, Ident4, Ident5] = range(1, 6)
 
+
 class Record:
 
-    def __init__(self, PtrComp = None, Discr = 0, EnumComp = 0,
-                       IntComp = 0, StringComp = 0):
+    def __init__(self, PtrComp=None, Discr=0, EnumComp=0,
+                 IntComp=0, StringComp=0):
         self.PtrComp = PtrComp
         self.Discr = Discr
         self.EnumComp = EnumComp
@@ -49,18 +51,21 @@ class Record:
         return Record(self.PtrComp, self.Discr, self.EnumComp,
                       self.IntComp, self.StringComp)
 
+
 TRUE = 1
 FALSE = 0
 
+
 def main(loops=LOOPS):
     benchtime, stones = pystones(loops)
-    print("Pystone(%s) time for %d passes = %g" % \
+    print("Pystone(%s) time for %d passes = %g" %
           (__version__, loops, benchtime))
     print("This machine benchmarks at %g pystones/second" % stones)
 
 
 def pystones(loops=LOOPS):
     return Proc0(loops)
+
 
 IntGlob = 0
 BoolGlob = FALSE
@@ -70,6 +75,7 @@ Array1Glob = [0]*51
 Array2Glob = [x[:] for x in [Array1Glob]*51]
 PtrGlb = None
 PtrGlbNext = None
+
 
 def Proc0(loops=LOOPS):
     global IntGlob
@@ -81,11 +87,9 @@ def Proc0(loops=LOOPS):
     global PtrGlb
     global PtrGlbNext
 
-    #starttime = clock()
     starttime = utime.time()
     for i in range(loops):
         pass
-    #nulltime = clock() - starttime
     nulltime = utime.time() - starttime
 
     PtrGlbNext = Record()
@@ -98,7 +102,6 @@ def Proc0(loops=LOOPS):
     String1Loc = "DHRYSTONE PROGRAM, 1'ST STRING"
     Array2Glob[8][7] = 10
 
-    #starttime = clock()
     starttime = utime.time()
 
     for i in range(loops):
@@ -125,13 +128,13 @@ def Proc0(loops=LOOPS):
         IntLoc2 = 7 * (IntLoc3 - IntLoc2) - IntLoc1
         IntLoc1 = Proc2(IntLoc1)
 
-    #benchtime = clock() - starttime - nulltime
-    benchtime = utime.time() -starttime - nulltime
+    benchtime = utime.time() - starttime - nulltime
     if benchtime == 0.0:
         loopsPerBenchtime = 0.0
     else:
         loopsPerBenchtime = (loops / benchtime)
     return benchtime, loopsPerBenchtime
+
 
 def Proc1(PtrParIn):
     PtrParIn.PtrComp = NextRecord = PtrGlb.copy()
@@ -149,6 +152,7 @@ def Proc1(PtrParIn):
     NextRecord.PtrComp = None
     return PtrParIn
 
+
 def Proc2(IntParIO):
     IntLoc = IntParIO + 10
     while 1:
@@ -160,6 +164,7 @@ def Proc2(IntParIO):
             break
     return IntParIO
 
+
 def Proc3(PtrParOut):
     global IntGlob
 
@@ -170,13 +175,14 @@ def Proc3(PtrParOut):
     PtrGlb.IntComp = Proc7(10, IntGlob)
     return PtrParOut
 
+
 def Proc4():
     global Char2Glob
-
 
     BoolLoc = Char1Glob == 'A'
     BoolLoc = BoolLoc or BoolGlob
     Char2Glob = 'B'
+
 
 def Proc5():
     global Char1Glob
@@ -185,6 +191,7 @@ def Proc5():
 
     Char1Glob = 'A'
     BoolGlob = FALSE
+
 
 def Proc6(EnumParIn):
     EnumParOut = EnumParIn
@@ -205,10 +212,12 @@ def Proc6(EnumParIn):
         EnumParOut = Ident3
     return EnumParOut
 
+
 def Proc7(IntParI1, IntParI2):
     IntLoc = IntParI1 + 2
     IntParOut = IntParI2 + IntLoc
     return IntParOut
+
 
 def Proc8(Array1Par, Array2Par, IntParI1, IntParI2):
     global IntGlob
@@ -223,6 +232,7 @@ def Proc8(Array1Par, Array2Par, IntParI1, IntParI2):
     Array2Par[IntLoc+20][IntLoc] = Array1Par[IntLoc]
     IntGlob = 5
 
+
 def Func1(CharPar1, CharPar2):
     CharLoc1 = CharPar1
     CharLoc2 = CharLoc1
@@ -230,6 +240,7 @@ def Func1(CharPar1, CharPar2):
         return Ident1
     else:
         return Ident2
+
 
 def Func2(StrParI1, StrParI2):
     IntLoc = 1
@@ -248,13 +259,17 @@ def Func2(StrParI1, StrParI2):
         else:
             return FALSE
 
+
 def Func3(EnumParIn):
     EnumLoc = EnumParIn
-    if EnumLoc == Ident3: return TRUE
+    if EnumLoc == Ident3:
+        return TRUE
     return FALSE
+
 
 if __name__ == '__main__':
     import sys
+
     def error(msg):
         print(msg, end=' ', file=sys.stderr)
         print("usage: %s [number_of_loops]" % sys.argv[0], file=sys.stderr)
@@ -264,7 +279,8 @@ if __name__ == '__main__':
         error("%d arguments are too many;" % nargs)
 
     elif nargs == 1:
-        try: loops = int(sys.argv[1])
+        try:
+            loops = int(sys.argv[1])
         except ValueError:
             error("Invalid argument %r;" % sys.argv[1])
     else:
